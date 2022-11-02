@@ -2,6 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
+import "openzeppelin-contracts/contracts/utils/Address.sol";
 import "../IRouter.sol";
 import "../libraries/ApproveHelper.sol";
 
@@ -26,14 +27,16 @@ contract RouterForbidERC20 is IRouter {
             // Do nothing
         }
 
-        // Forwarder is used for interacting with ERC20-compliant contract using ethical data.
+        require(Address.isContract(to), "NOT_CONTRACT");
+
+        // Forwarder is used for interacting with ERC20-compliant contract.
         if (to == forwarder) {
-            // Pull tokenIn to forwarder
+            // Pull tokenIn to forwarder directly
             IERC20(tokenIn).safeTransferFrom(msg.sender, forwarder, amountIn);
 
             // Execute forwarder
-            (bool success, bytes memory result) = to.call(data);
-            require(success && (result.length == 0 || abi.decode(result, (bool))), "FAIL_FORWARDER");
+            (bool success,) = to.call(data);
+            require(success, "FAIL_FORWARDER");
         } else {
             // Pull tokenIn
             IERC20(tokenIn).safeTransferFrom(msg.sender, address(this), amountIn);
@@ -42,8 +45,8 @@ contract RouterForbidERC20 is IRouter {
             ApproveHelper._tokenApprove(tokenIn, to, type(uint256).max);
 
             // Execute
-            (bool success, bytes memory result) = to.call(data);
-            require(success && (result.length == 0 || abi.decode(result, (bool))), "FAIL");
+            (bool success,) = to.call(data);
+            require(success, "FAIL");
 
             // Approve zero
             ApproveHelper._tokenApproveZero(tokenIn, to);

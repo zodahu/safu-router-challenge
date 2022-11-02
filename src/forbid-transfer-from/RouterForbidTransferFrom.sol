@@ -2,6 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
+import "openzeppelin-contracts/contracts/utils/Address.sol";
 import "../IRouter.sol";
 import "../libraries/ApproveHelper.sol";
 
@@ -18,6 +19,8 @@ contract RouterForbidTransferFrom {
         bytes4 sig = bytes4(data[:4]);
         require(sig != TRANSFER_FROM_SIG, "Unsafu");
 
+        require(Address.isContract(to), "NOT_CONTRACT");
+
         // Pull tokenIn
         IERC20(tokenIn).safeTransferFrom(msg.sender, address(this), amountIn);
 
@@ -25,8 +28,8 @@ contract RouterForbidTransferFrom {
         ApproveHelper._tokenApprove(tokenIn, to, type(uint256).max);
 
         // Execute
-        (bool success, bytes memory result) = to.call(data);
-        require(success && (result.length == 0 || abi.decode(result, (bool))), "FAIL");
+        (bool success,) = to.call(data);
+        require(success, "FAIL");
 
         // Approve zero
         ApproveHelper._tokenApproveZero(tokenIn, to);

@@ -5,6 +5,5 @@
   "[solidity]": {
     "editor.defaultFormatter": "JuanBlanco.solidity"
   },
-  "solidity.formatter": "forge",
-  "search.exclude": { "lib": true }
+  "solidity.formatter": "forge"
 }
