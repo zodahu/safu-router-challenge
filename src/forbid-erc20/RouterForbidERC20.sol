@@ -2,7 +2,6 @@
 pragma solidity ^0.8.0;
 
 import "openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
-import "openzeppelin-contracts/contracts/utils/Address.sol";
 import "../IRouter.sol";
 import "../libraries/ApproveHelper.sol";
 
@@ -21,13 +20,8 @@ contract RouterForbidERC20 is IRouter {
     /// @dev Is there any token which hasn't balanceOf function but has other functions which can use user's allowances?
     function zap(address tokenIn, uint256 amountIn, address tokenOut, address to, bytes calldata data) external {
         // Safu?
-        try IERC20(to).balanceOf(address(0)) {
-            revert("Unsafu");
-        } catch {
-            // Do nothing
-        }
-
-        require(Address.isContract(to), "NOT_CONTRACT");
+        (bool success,) = to.call(abi.encodeWithSelector(IERC20.balanceOf.selector, address(0)));
+        require(!success, "Unsafu");
 
         // Forwarder is used for interacting with ERC20-compliant contract.
         if (to == forwarder) {
@@ -35,7 +29,7 @@ contract RouterForbidERC20 is IRouter {
             IERC20(tokenIn).safeTransferFrom(msg.sender, forwarder, amountIn);
 
             // Execute forwarder
-            (bool success,) = to.call(data);
+            (success,) = to.call(data);
             require(success, "FAIL_FORWARDER");
         } else {
             // Pull tokenIn
@@ -45,7 +39,7 @@ contract RouterForbidERC20 is IRouter {
             ApproveHelper._tokenApprove(tokenIn, to, type(uint256).max);
 
             // Execute
-            (bool success,) = to.call(data);
+            (success,) = to.call(data);
             require(success, "FAIL");
 
             // Approve zero
