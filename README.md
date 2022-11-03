@@ -1,5 +1,7 @@
 # Safu Router Challenge
 
+[![test](https://github.com/zodahu/safu-router-challenge/actions/workflows/test.yml/badge.svg)](https://github.com/zodahu/safu-router-challenge/actions/workflows/test.yml)
+
 > This is highly experimental contracts not recommended for production.
 
 This repository contains a few mechnisms to create a safu router which don't relay on whitelist to protect user's approvals.
