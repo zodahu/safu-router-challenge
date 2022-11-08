@@ -5,7 +5,6 @@ import "openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./Spender.sol";
 import "../IRouter.sol";
 import "../libraries/ApproveHelper.sol";
-import "forge-std/Test.sol";
 
 contract RouterSpender is IRouter {
     using SafeERC20 for IERC20;
@@ -16,10 +15,8 @@ contract RouterSpender is IRouter {
         spender = new Spender(address(this));
     }
 
-    /// @notice
-    /// @dev
+    /// @notice Router calls Spender to pull user's token
     function zap(address tokenIn, uint256 amountIn, address tokenOut, address to, bytes calldata data) external {
-        require(Address.isContract(to), "NOT_CONTRACT");
         require(to != address(spender), "SPENDER");
 
         // Pull tokenIn

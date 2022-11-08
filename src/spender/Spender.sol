@@ -3,9 +3,8 @@ pragma solidity ^0.8.0;
 
 import "openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
 import "openzeppelin-contracts/contracts/utils/Address.sol";
-import "../libraries/ApproveHelper.sol";
-import "forge-std/Test.sol";
 
+/// @notice Users approve tokens to Spender
 contract Spender {
     using SafeERC20 for IERC20;
 
@@ -15,6 +14,7 @@ contract Spender {
         router = router_;
     }
 
+    /// @notice Transfer tokens from user to Router
     function transferFromERC20(address from, address token, uint256 amount) external {
         require(msg.sender == router, "Unsafu");
 

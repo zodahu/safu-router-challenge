@@ -3,8 +3,8 @@ pragma solidity ^0.8.0;
 
 import "forge-std/Test.sol";
 import "openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
-import "../src/forbid-erc20-spender/RouterSpender.sol";
-import "../src/forbid-erc20-spender/Spender.sol";
+import "../src/spender/RouterSpender.sol";
+import "../src/spender/Spender.sol";
 
 interface IYVault {
     function deposit(uint256) external;
